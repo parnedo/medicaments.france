@@ -10,17 +10,18 @@ import re
 class medicament_parser:
     def __init__(self, data):
         self.removeHTMLTags = re.compile(r'<.*?>')
-        self.mTree = BeautifulSoup (data)
+        self.mTree = BeautifulSoup (data, convertEntities=BeautifulSoup.HTML_ENTITIES)
         self.mHtml_parser = HTMLParser.HTMLParser()
 
     def procLine(self, line):
-        return self.mMtml_parser.unescape(line.encode('utf-8').strip())
+        l = str(line.encode('utf-8').strip())
+        return ' '.join(l.split())
 
     def parse(self):
         m = medicament()
 
         try:
-            m.mTitle        = self.procLine(self.mTree.find('h1', attrs={'class':'textedeno'}).text)
+            m.mTitle = self.procLine(self.mTree.find('h1', attrs={'class':'textedeno'}).text)
         except (AttributeError, TypeError):
             pass
 
