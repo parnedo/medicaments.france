@@ -7,12 +7,13 @@ class main:
         self.mBaseUrl = 'base-donnees-publique.medicaments.gouv.fr'
 
     def fetchMedicaments(self, filename):
-        from parser import medicament_parser
-        for upperCase in map(chr, range(ord('A'), ord('Z')+1)):
+        from medicament_parser import medicament_parser
+        for upperCase in map(chr, range(ord('a'), ord('z')+1)):
             for med in self.getMedURL_List(self.fetchURL(upperCase)):
-                print med
                 medData = self.getMedData(med)
                 medicament = medicament_parser(self.getMedData(med)).parse()
+                medicament.mCodeCIS = med[19:]
+                print med, medicament.mTitle
                 self.mMedicament_list += [medicament]
                 f = open(filename, 'a')
                 f.write(str(medicament)+'\n')
@@ -52,7 +53,7 @@ class main:
         from BeautifulSoup import BeautifulSoup
         import re
         site = BeautifulSoup(html)
-        return [x['href'] for x in site.findAll('a',attrs={'class':'standart'})]
+        return [x.attrMap['href'] for x in site.findAll('a',attrs={'href':re.compile ("^extrait.php")})]
 
 if __name__ == "__main__":
     main().fetchMedicaments("med.txt")

@@ -13,6 +13,7 @@ class medicament_parser:
         self.mTree = BeautifulSoup (data, convertEntities=BeautifulSoup.HTML_ENTITIES)
         self.mHtml_parser = HTMLParser.HTMLParser()
 
+
     def procLine(self, line):
         l = str(line.encode('utf-8').strip())
         return ' '.join(l.split())
@@ -47,6 +48,14 @@ class medicament_parser:
         except (AttributeError, TypeError):
             pass
 
+        for br in self.mTree.findAll('br'):
+            if br.previousSibling is not None:
+                if "CIP" in br.previousSibling:
+                    try:
+                        m.mCodeCIP13 = re.search('Code CIP : .*? ou (.*)', str(br.previousSibling)).groups()[0].replace(' ','')
+                    except:
+                        m.mCodeCIP13 = re.search('Code CIP : (.*)', str(br.previousSibling)).groups()[0].replace(' ','')
+
 
         try:
             htmlSMR = self.mTree.find('table', attrs={'summary':unicode(u'Liste des avis de SMR rendus par la commission de la transparence')})
@@ -69,7 +78,8 @@ class medicament_parser:
         return m
 
 if __name__ == "__main__":
-    with open ("sample.html", "r") as myfile:
+    import sys
+    with open (sys.argv[1], "r") as myfile:
         data=myfile.read()
     m = medicament_parser(data).parse()
     print m
