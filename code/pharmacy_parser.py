@@ -57,3 +57,7 @@ if __name__ == "__main__":
         data=myfile.read()
     print [pharmacy_parser(data).parse()]
 
+    p = pharmacy_parser(data).parse()
+    p.idx = 62971
+    print p.sql()
+

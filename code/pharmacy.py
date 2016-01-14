@@ -3,14 +3,14 @@
 
 class pharmacy:
     def __init__(self):
-        self.idx       = None
-        self.commercial= None
-        self.social    = None
-        self.addresse  = None
-        self.postalcode= None
-        self.city      = None
-        self.telephone = None
-        self.fax       = None
+        self.idx       =''
+        self.commercial=''
+        self.social    =''
+        self.addresse  =''
+        self.postalcode=''
+        self.city      =''
+        self.telephone =''
+        self.fax       =''
 
     def clean(self):
         import re
@@ -35,3 +35,54 @@ class pharmacy:
 
     def __repr__(self):
         return self.__str__()
+
+    def escape (self, data):
+        import MySQLdb
+        return MySQLdb.escape_string(str(data))
+
+    @staticmethod
+    def fromCsv(line):
+        res = pharmacy()
+        csv = line.split('|')
+        res.idx       =  csv[0].replace('None','')
+        res.social    =  csv[1].replace('None','')
+        res.commercial=  csv[2].replace('None','')
+        res.addresse  =  csv[3].replace('None','')
+        res.postalcode=  csv[4].replace('None','')
+        res.city      =  csv[5].replace('None','')
+        res.telephone =  csv[6].replace('None','')
+        res.fax       =  csv[7].replace('None','')
+        return res
+
+    def sql(self):
+        self.clean()
+        res = "INSERT INTO `Pharma` ("\
+              +  "`pharma_id`, "\
+              +  "`pharma_title`, "\
+              +  "`pharma_empl`, "\
+              +  "`pharma_desc`, "\
+              +  "`pharma_hours`, "\
+              +  "`pharma_adress`, "\
+              +  "`pharma_lat`, "\
+              +  "`pharma_long`, "\
+              +  "`pharma_contact_mail`, "\
+              +  "`pharma_contact_tel`, "\
+              +  "`pharma_validated`"\
+              +") VALUES ("\
+              +       str(self.idx)       +","\
+              +  "'" +self.escape(self.social    )+ "',"\
+              +  "'" +self.escape(self.commercial)+ "',"\
+              +  "'',"\
+              +  "'',"\
+              +  "'" +self.escape(self.addresse + ", " + self.postalcode + ", " + self.city) + "',"\
+              +  "0,"\
+              +  "0,"\
+              +  "'',"\
+              +  "'" +self.escape(self.telephone) + "',"\
+              +  "0"\
+              +  ");"
+        return res
+
+
+
+
